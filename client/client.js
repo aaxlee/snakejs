@@ -1,4 +1,4 @@
-var socket = io();
+var socket = io("http://10.32.45.162:3000");
 
 var c = document.getElementById("canvas");
 var ctx = c.getContext("2d");
