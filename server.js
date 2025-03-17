@@ -31,7 +31,11 @@ function create_player()
                         up: false,
                         down: false
                 },
-                len: 1,
+                tail: [
+                        { x: -1, y: 0 },
+                        { x: -2, y: 0 },
+                        { x: -3, y: 0 }
+                ],
                 connected: 1,
         };
         state.players.push(p);
@@ -53,6 +57,32 @@ function update_positions()
         }
 }
 
+function update_snakes()
+{
+        for (let i = 0; i < state.players.length; i++) {
+                let prev = state.players[i].pos;
+                if (state.players[i].dir.up) {
+                        state.players[i].pos.y -= grid_size;
+                } else if (state.players[i].dir.down) {
+                        state.players[i].pos.y += grid_size;
+                } else if (state.players[i].dir.left) {
+                        state.players[i].pos.x -= grid_size;
+                } else if (state.players[i].dir.right) {
+                        state.players[i].pos.x += grid_size;
+                }
+
+                let next;
+                if (state.players[i].tail.length == 0) {
+                        break;
+                }
+                for (let j = 0; j < state.players[i].tail.length; j++) {
+                        next = state.players[i].tail[j];
+                        state.players[i].tail[j] = prev;
+                        prev = next;
+                }
+        }
+}
+
 io.on("connection", (socket) => {
         let socket_id = socket.id;
         console.log("a user connected");
@@ -65,11 +95,14 @@ io.on("connection", (socket) => {
 
         socket.on("disconnect", () => {
                 console.log("user disconnected");
+                // state.players[player_index].connected = 0;
+                // io.emit("server_upd", state);
         });
 
         socket.on("client_upd", (s, client_id) => {
                 state = s;
-                update_positions();
+                // update_positions();
+                update_snakes();
                 io.emit("server_upd", state);
         });
 });
