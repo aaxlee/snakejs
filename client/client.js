@@ -7,8 +7,6 @@ export let p;
 export let id;
 export let player_index;
 
-let last_timestamp = 0;
-
 socket.on("game_init", (player, state, socket_id, index) => {
         console.log(player);
         p = player;
@@ -22,6 +20,7 @@ socket.on("server_upd", (state) => {
         s = state;
 });
 
+let last_timestamp = 0;
 let last_frame_time = 0;
 let fps;
 let count = 0;
@@ -32,20 +31,11 @@ function main(timestamp)
         if (dtime >= FRAME_TIME) { 
                 last_frame_time = timestamp;
 
-                if (last_timestamp > 0) {
-                        let delta = (timestamp - last_timestamp) / 1000;
-                        fps = 1 / delta;
-                }
-                last_timestamp = timestamp;
-
-                // Game loop
-                if (count >= 15) {
-                        socket.emit("client_upd", s, id);
-                        count = 0;
-                }
                 ctx.clearRect(0, 0, 900, 450);
                 draw_grid();
                 draw_state(s);
+
+                last_timestamp = timestamp;
         }
 
         count++;

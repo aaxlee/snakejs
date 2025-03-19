@@ -22,7 +22,7 @@ export function draw_grid()
 export function draw_player(player)
 {
         ctx.beginPath();
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = player.color;
         ctx.fillRect(player.pos.x, player.pos.y, 50, 50);
         player.tail.forEach((tail) => {
                 ctx.fillRect(tail.x, tail.y, 50, 50);
