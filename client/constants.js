@@ -1,4 +1,4 @@
-// export const socket = io("http://10.32.45.162:3000");
+// http://10.32.45.162:3000
 export const socket = io();
 
 export const c = document.getElementById("canvas");

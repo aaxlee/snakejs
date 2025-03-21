@@ -3,17 +3,25 @@ import { draw_grid, draw_player, draw_state } from "./rendering.js";
 import "./events.js";
 
 export let s;
-export let p;
 export let id;
-export let player_index;
+export let player_index = -1;
 
-socket.on("game_init", (player, state, socket_id, index) => {
-        console.log(player);
-        p = player;
+socket.on("game_init", (state, socket_id) => {
         s = state;
         id = socket_id;
-        player_index = index;
-        requestAnimationFrame(main);
+
+        for (let i = 0; i < state.players.length; i++) {
+                if (state.players[i].socket_id == socket_id) {
+                        player_index = i;
+                        break;
+                }
+        }
+
+        if (player_index != -1) {
+                requestAnimationFrame(main);
+        } else {
+                console.log("Player index error");
+        }
 });
 
 socket.on("server_upd", (state) => {

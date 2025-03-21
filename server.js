@@ -14,10 +14,8 @@ app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, "client", "index.html"));
 });
 
-const Game = require("./game/player.js");
-let state = {
-        players: []
-};
+const Game = require("./game/game.js");
+const Player = require("./game/player.js");
 const Events = require("./game/events.js");
 
 function get_random_color() {
@@ -28,20 +26,25 @@ io.on("connection", (socket) => {
         let socket_id = socket.id;
         console.log("a user connected");
 
-        let player = Game.create_player(state, socket_id, get_random_color());
+        let player = Player.create_player(Game.state, socket_id, get_random_color());
         let player_index = player.id;
+        Game.state.players.push(player);
+
+        if (Game.state.players.length >= 3) {
+                Game.state.grid_size /= 2;
+        }
 
         console.log(player);
-        socket.emit("game_init", player, state, socket_id, player_index);
+        socket.emit("game_init", Game.state, socket_id);
 
         socket.on("disconnect", () => {
                 console.log("user disconnected");
         });
 
         socket.on("client_event", (e, id) => {
-                for (let i = 0; i < state.players.length; i++) {
-                        if (state.players[i].socket_id == id) {
-                                Events.process_event(e, state.players[i]);
+                for (let i = 0; i < Game.state.players.length; i++) {
+                        if (Game.state.players[i].socket_id == id) {
+                                Events.process_event(e, Game.state.players[i]);
                         }
                 }
         });
@@ -50,8 +53,9 @@ io.on("connection", (socket) => {
 
 const TICK_RATE = 60 * 4
 setInterval(() => {
-        Game.update_snakes(state);
-        io.emit("server_upd", state);
+        Game.warp_snakes();
+        Game.update_snakes();
+        io.emit("server_upd", Game.state);
 }, TICK_RATE);
 
 server.listen(port, "0.0.0.0", () => {
