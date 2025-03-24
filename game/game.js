@@ -3,6 +3,7 @@ const HEIGHT = 450
 
 let state = {
         players: [],
+        food: [],
         grid_size: 50,
         width: WIDTH,
         height: HEIGHT,
@@ -14,12 +15,12 @@ function warp_snakes()
 {
         state.players.forEach((player) => {
                 if (player.pos.x < 0) {
-                        player.pos.x = state.width;
-                } else if (player.pos.x > state.width) {
+                        player.pos.x = state.width - state.grid_size;
+                } else if (player.pos.x > state.width - state.grid_size) {
                         player.pos.x = 0;
                 } else if (player.pos.y < 0) {
-                        player.pos.y = state.height;
-                } else if (player.pos.y > state.height) {
+                        player.pos.y = state.height - state.grid_size;
+                } else if (player.pos.y > state.height - state.grid_size) {
                         player.pos.y = 0;
                 }
         });
@@ -57,25 +58,90 @@ function update_map()
 {
         const rows = state.height / state.grid_size;
         const cols = state.width / state.grid_size;
+
         for (let y = 0; y < rows; y++) {
                 map[y] = [];
                 for (let x = 0; x < cols; x++) {
-                        map[y][x] = 0;
+                        map[y][x] = {
+                                occupants: [],
+                                is_occupied: 0
+                        };
                 }
         }
+
+        state.food.forEach((food) => {
+                map[food.y / state.grid_size][food.x / state.grid_size].is_occupied = 1;
+                map[food.y / state.grid_size][food.x / state.grid_size].occupants.push(food);
+
+        });
+
         state.players.forEach((player) => {
-                map[player.pos.y / state.grid_size][player.pos.x / state.grid_size] = 1;
+                map[player.pos.y / state.grid_size][player.pos.x / state.grid_size].is_occupied = 1;
+                map[player.pos.y / state.grid_size][player.pos.x / state.grid_size].occupants.push(player);
+
                 player.tail.forEach((tail) => {
-                        if (tail.x >= 0 && tail.y >= 0) {
-                                map[tail.y / state.grid_size][tail.x / state.grid_size] = 1;
-                        }
+                        map[tail.y / state.grid_size][tail.x / state.grid_size].is_occupied = 1;
+                        map[tail.y / state.grid_size][tail.x / state.grid_size].occupants.push(tail);
                 });
         });
 }
 
 function generate_food()
 {
+        const rows = state.height / state.grid_size;
+        const cols = state.width / state.grid_size;
 
+        let x = Math.floor(Math.random() * cols);
+        let y = Math.floor(Math.random() * rows);
+
+        const start_x = x;
+        const start_y = y;
+        let free_cell = 1;
+        while (map[y][x].is_occupied) {
+                if (x == start_x && y == start_y) {
+                        free_cell = 0;
+                        break;
+                }
+                y = (y + 1) % rows;
+                while (map[y][x].is_occupied) {
+                        x = (x + 1) % cols;
+                }
+        }
+
+        if (free_cell) {
+                state.food.push({
+                        x: x * state.grid_size,
+                        y: y * state.grid_size,
+                        entity_type: "food"
+                });
+        }
+}
+
+function check_collision()
+{
+        const rows = state.height / state.grid_size;
+        const cols = state.width / state.grid_size;
+
+        for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                        if (!map[y][x].is_occupied) {
+                                continue;
+                        }
+                        
+                        // shit code fix later
+                        if (map[y][x].occupants.length != 2) {
+                                continue;
+                        }
+
+                        if (map[y][x].occupants[0].entity_type == "food" &&
+                            map[y][x].occupants[1].entity_type == "player") {
+
+                                state.food = state.food.filter((food) => food != map[y][x].occupants[0]);
+                                continue;
+                        }
+
+                }
+        }
 }
 
 module.exports = {
@@ -83,5 +149,7 @@ module.exports = {
         map,
         update_snakes,
         update_map,
-        warp_snakes
+        warp_snakes,
+        generate_food,
+        check_collision
 }
