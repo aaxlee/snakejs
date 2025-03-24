@@ -1,5 +1,5 @@
 import { socket, WIDTH, HEIGHT, c, ctx, grid_size, TARGET_FPS, FRAME_TIME } from "./constants.js";
-import { draw_grid, draw_player, draw_state } from "./rendering.js";
+import { draw_grid, draw_food, draw_state } from "./rendering.js";
 import "./events.js";
 
 export let s;
@@ -41,6 +41,7 @@ function main(timestamp)
 
                 ctx.clearRect(0, 0, 900, 450);
                 draw_grid();
+                draw_food();
                 draw_state(s);
 
                 last_timestamp = timestamp;

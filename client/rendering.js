@@ -18,7 +18,17 @@ export function draw_grid()
         }
 }
 
-export function draw_player(player)
+export function draw_food()
+{
+        s.food.forEach((food) => {
+                ctx.beginPath();
+                ctx.fillStyle = "red";
+                ctx.fillRect(food.x, food.y, s.grid_size, s.grid_size);
+                ctx.stroke();
+        });
+}
+
+function draw_player(player)
 {
         ctx.beginPath();
         ctx.fillStyle = player.color;

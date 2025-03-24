@@ -18,8 +18,15 @@ const Game = require("./game/game.js");
 const Player = require("./game/player.js");
 const Events = require("./game/events.js");
 
-function get_random_color() {
+function get_random_color()
+{
         return '#' + Math.floor(Math.random() * 16777215).toString(16);
+}
+
+function print_map()
+{
+        console.clear();
+        console.log(Game.map.map(row => row.map(cell => (cell.is_occupied ? '█' : '.')).join(' ')).join('\n'));
 }
 
 io.on("connection", (socket) => {
@@ -52,10 +59,21 @@ io.on("connection", (socket) => {
 });
 
 const TICK_RATE = 60 * 4
+let counter = 1;
 setInterval(() => {
-        Game.warp_snakes();
+        Game.update_map();
         Game.update_snakes();
+        Game.warp_snakes();
+        if (counter == 15) {
+                Game.generate_food();
+                counter = 0;
+        }
+        Game.check_collision();
+        // print_map();
+
         io.emit("server_upd", Game.state);
+        
+        counter++;
 }, TICK_RATE);
 
 server.listen(port, "0.0.0.0", () => {
