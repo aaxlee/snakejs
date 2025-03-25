@@ -1,4 +1,3 @@
-// http://10.32.45.162:3000
 export const socket = io();
 
 export const c = document.getElementById("canvas");
@@ -9,4 +8,4 @@ export const WIDTH = c.width;
 export const HEIGHT = c.height;
 
 export const TARGET_FPS = 30;
-export const FRAME_TIME = 1000 / TARGET_FPS; // Time per frame in milliseconds
+export const FRAME_TIME = 1000 / TARGET_FPS; // time per frame (milliseconds)
