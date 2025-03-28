@@ -29,7 +29,7 @@ function warp_snakes()
 function update_snakes()
 {
         for (let i = 0; i < state.players.length; i++) {
-                let prev = { ...state.players[i].pos };
+                let prev = { ...state.players[i].pos, dir: { ...state.players[i].dir }, entity_type: "tail" };
                 if (state.players[i].dir.up) {
                         state.players[i].pos.y -= state.grid_size;
                 } else if (state.players[i].dir.down) {
@@ -47,9 +47,9 @@ function update_snakes()
                 }
 
                 for (let j = 0; j < state.players[i].tail.length; j++) {
-                        let next = state.players[i].tail[j];
-                        state.players[i].tail[j] = prev;
-                        prev = next;
+                        let next = JSON.parse(JSON.stringify(state.players[i].tail[j]));
+                        state.players[i].tail[j] = JSON.parse(JSON.stringify(prev));
+                        prev = JSON.parse(JSON.stringify(next));
                 }
         }
 }
@@ -137,11 +137,36 @@ function check_collision()
                             map[y][x].occupants[1].entity_type == "player") {
 
                                 state.food = state.food.filter((food) => food != map[y][x].occupants[0]);
+                                let index = state.players.indexOf(map[y][x].occupants[1]);
+                                extend_snake(state.players[index]);
                                 continue;
                         }
 
                 }
         }
+}
+
+function extend_snake(player)
+{
+        let end;
+        if (player.tail.length > 0) {
+                end = player.tail[player.tail.length - 1];
+        } else {
+                end = { ...player.pos , dir: { ...player.dir }, entity_type: "tail" };
+        }
+        let new_end = JSON.parse(JSON.stringify(end));
+        console.log(new_end);
+        if (new_end.dir.up) {
+                new_end.y -= state.grid_size;
+        } else if (end.dir.down) {
+                new_end.y += state.grid_size;
+        } else if (end.dir.left) {
+                new_end.x -= state.grid_size;
+        } else if (end.dir.right) {
+                new_end.x += state.grid_size;
+        }
+
+        player.tail.push(new_end);
 }
 
 module.exports = {
