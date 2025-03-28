@@ -10,9 +10,11 @@ function create_player(state, socket_id, color)
                         down: false
                 },
                 tail: [
-                        { x: 50, y: 0, entity_type: "tail" },
-                        { x: 100, y: 0, entity_type: "tail" },
-                        { x: 150, y: 0, entity_type: "tail" }
+                        /*
+                        { x: 50, y: 0, dir: {}, entity_type: "tail" },
+                        { x: 100, y: 0, dir: {}, entity_type: "tail" },
+                        { x: 150, y: 0, dir: {}, entity_type: "tail" }
+                        */
                 ],
                 color: color,
                 socket_id: socket_id,

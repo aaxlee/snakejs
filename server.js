@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
         let player_index = player.id;
         Game.state.players.push(player);
 
-        if (Game.state.players.length >= 3) {
+        if (Game.state.players.length % 3 == 0) {
                 Game.state.grid_size /= 2;
         }
 
