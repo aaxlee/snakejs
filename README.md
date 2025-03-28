@@ -1,6 +1,7 @@
 # snakejs
 
 Multiplayer Snake game built with Node.js.
+Currently WIP
 
 ## Requirements
 - Node.js
