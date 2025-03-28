@@ -62,13 +62,13 @@ const TICK_RATE = 60 * 4
 let counter = 1;
 setInterval(() => {
         Game.update_map();
+        Game.check_collision();
         Game.update_snakes();
         Game.warp_snakes();
         if (counter == 15) {
                 Game.generate_food();
                 counter = 0;
         }
-        Game.check_collision();
         // print_map();
 
         io.emit("server_upd", Game.state);

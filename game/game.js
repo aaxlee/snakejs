@@ -29,7 +29,7 @@ function warp_snakes()
 function update_snakes()
 {
         for (let i = 0; i < state.players.length; i++) {
-                let prev = { ...state.players[i].pos, dir: { ...state.players[i].dir }, entity_type: "tail" };
+                let prev = { ...state.players[i].pos, dir: { ...state.players[i].dir }, parent_id: state.players[i].socket_id, entity_type: "tail" };
                 if (state.players[i].dir.up) {
                         state.players[i].pos.y -= state.grid_size;
                 } else if (state.players[i].dir.down) {
@@ -47,9 +47,12 @@ function update_snakes()
                 }
 
                 for (let j = 0; j < state.players[i].tail.length; j++) {
-                        let next = JSON.parse(JSON.stringify(state.players[i].tail[j]));
-                        state.players[i].tail[j] = JSON.parse(JSON.stringify(prev));
-                        prev = JSON.parse(JSON.stringify(next));
+                        // let next = JSON.parse(JSON.stringify(state.players[i].tail[j]));
+                        let next = state.players[i].tail[j];
+                        // state.players[i].tail[j] = JSON.parse(JSON.stringify(prev));
+                        state.players[i].tail[j] = prev;
+                        // prev = JSON.parse(JSON.stringify(next));
+                        prev = next;
                 }
         }
 }
@@ -127,21 +130,28 @@ function check_collision()
                         if (!map[y][x].is_occupied) {
                                 continue;
                         }
-                        
-                        // shit code fix later
-                        if (map[y][x].occupants.length != 2) {
-                                continue;
+                        let occupants = map[y][x].occupants;
+                        let player = occupants.find(o => o.entity_type === "player");
+                        let tail = occupants.find(o => o.entity_type === "tail");
+                        let food = occupants.find(o => o.entity_type === "food");
+
+                        if (player && food) {
+                                extend_snake(player);
+                                let index = state.food.indexOf(food);
+                                state.food.splice(index, 1);
+                        } else if (player && tail) {
+                                let colliding_player;
+                                state.players.forEach(p => {
+                                        if (p.socket_id === tail.parent_id) {
+                                                colliding_player = p;
+                                        }
+                                });
+
+                                let index = colliding_player.tail.indexOf(tail);
+                                if (index !== -1) {
+                                        colliding_player.tail.splice(index);
+                                } 
                         }
-
-                        if (map[y][x].occupants[0].entity_type == "food" &&
-                            map[y][x].occupants[1].entity_type == "player") {
-
-                                state.food = state.food.filter((food) => food != map[y][x].occupants[0]);
-                                let index = state.players.indexOf(map[y][x].occupants[1]);
-                                extend_snake(state.players[index]);
-                                continue;
-                        }
-
                 }
         }
 }
@@ -152,18 +162,17 @@ function extend_snake(player)
         if (player.tail.length > 0) {
                 end = player.tail[player.tail.length - 1];
         } else {
-                end = { ...player.pos , dir: { ...player.dir }, entity_type: "tail" };
+                end = { ...player.pos , dir: { ...player.dir }, parent_id: player.socket_id, entity_type: "tail" };
         }
         let new_end = JSON.parse(JSON.stringify(end));
-        console.log(new_end);
         if (new_end.dir.up) {
-                new_end.y -= state.grid_size;
-        } else if (end.dir.down) {
                 new_end.y += state.grid_size;
-        } else if (end.dir.left) {
-                new_end.x -= state.grid_size;
-        } else if (end.dir.right) {
+        } else if (new_end.dir.down) {
+                new_end.y -= state.grid_size;
+        } else if (new_end.dir.left) {
                 new_end.x += state.grid_size;
+        } else if (new_end.dir.right) {
+                new_end.x -= state.grid_size;
         }
 
         player.tail.push(new_end);
