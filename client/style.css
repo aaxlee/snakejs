@@ -1,9 +1,43 @@
+#title-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #fafafa;
+}
+
+#title-screen h1 {
+    font-size: 3em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#join-button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#join-button:hover {
+    background-color: #218838;
+}
+
 #canvas-container {
-        display: flex;
-        justify-content: center;
-        align-items: space-evenly;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
 }
 
 #canvas {
-        border: 1px solid black;
+    border: 2px solid #222;
+    border-radius: 10px;
+    background-color: #eaeaea;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
