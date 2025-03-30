@@ -3,6 +3,8 @@ import { ctx, WIDTH, HEIGHT, grid_size } from "./constants.js";
 
 export function draw_grid()
 {
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.lineWidth = 1;
         for (let y = 0; y < HEIGHT; y += s.grid_size) {
                 ctx.beginPath();
                 ctx.moveTo(0, y);
@@ -30,9 +32,12 @@ export function draw_food()
 
 function draw_player(player)
 {
-        ctx.beginPath();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+        ctx.shadowBlur = 5;
+
         ctx.fillStyle = player.color;
         ctx.fillRect(player.pos.x, player.pos.y, s.grid_size, s.grid_size);
+
         player.tail.forEach((tail) => {
                 ctx.fillRect(tail.x, tail.y, s.grid_size, s.grid_size);
         });
