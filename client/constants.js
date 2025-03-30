@@ -1,6 +1,10 @@
 export const socket = io();
 
+export const join_button = document.getElementById("join-button");
+export const title_screen = document.getElementById("title-screen");
+
 export const c = document.getElementById("canvas");
+export const canvas_container = document.getElementById("canvas-container");
 export const ctx = c.getContext("2d");
 export const grid_size = 50;
 
