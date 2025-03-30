@@ -33,16 +33,18 @@ io.on("connection", (socket) => {
         let socket_id = socket.id;
         console.log("a user connected");
 
-        let player = Player.create_player(Game.state, socket_id, get_random_color());
-        let player_index = player.id;
-        Game.state.players.push(player);
+        socket.on("join_game", () => {
+                let player = Player.create_player(Game.state, socket_id, get_random_color());
+                let player_index = player.id;
+                Game.state.players.push(player);
 
-        if (Game.state.players.length % 3 == 0) {
-                Game.state.grid_size /= 2;
-        }
+                if (Game.state.players.length % 3 == 0) {
+                        Game.state.grid_size /= 2;
+                }
 
-        console.log(player);
-        socket.emit("game_init", Game.state, socket_id);
+                console.log(player);
+                socket.emit("game_init", Game.state, socket_id);
+        });
 
         socket.on("disconnect", () => {
                 console.log("user disconnected");
