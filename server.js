@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
         console.log("a user connected");
 
         socket.on("join_game", () => {
-                let player = Player.create_player(Game.state, socket_id, get_random_color());
+                let player = new Player({x: 0, y: 0}, socket_id, get_random_color());
                 let player_index = player.id;
                 Game.state.players.push(player);
 
@@ -65,8 +65,8 @@ let counter = 1;
 setInterval(() => {
         Game.update_map();
         Game.check_collision();
-        Game.update_snakes();
-        Game.warp_snakes();
+	Game.update_snakes();
+	Game.warp_snakes();
         if (counter == 15) {
                 Game.generate_food();
                 counter = 0;
