@@ -13,48 +13,20 @@ let map = [];
 
 function warp_snakes()
 {
-        state.players.forEach((player) => {
-                if (player.pos.x < 0) {
-                        player.pos.x = state.width - state.grid_size;
-                } else if (player.pos.x > state.width - state.grid_size) {
-                        player.pos.x = 0;
-                } else if (player.pos.y < 0) {
-                        player.pos.y = state.height - state.grid_size;
-                } else if (player.pos.y > state.height - state.grid_size) {
-                        player.pos.y = 0;
-                }
-        });
+	state.players.forEach(player => {
+		player.warp({
+			height: state.height,
+			width: state.width,
+			grid_size: state.grid_size
+		});
+	});
 }
 
 function update_snakes()
 {
-        for (let i = 0; i < state.players.length; i++) {
-                let prev = { ...state.players[i].pos, dir: { ...state.players[i].dir }, parent_id: state.players[i].socket_id, entity_type: "tail" };
-                if (state.players[i].dir.up) {
-                        state.players[i].pos.y -= state.grid_size;
-                } else if (state.players[i].dir.down) {
-                        state.players[i].pos.y += state.grid_size;
-                } else if (state.players[i].dir.left) {
-                        state.players[i].pos.x -= state.grid_size;
-                } else if (state.players[i].dir.right) {
-                        state.players[i].pos.x += state.grid_size;
-                } else {
-                        continue;
-                }
-
-                if (state.players[i].tail.length == 0) {
-                        continue;
-                }
-
-                for (let j = 0; j < state.players[i].tail.length; j++) {
-                        // let next = JSON.parse(JSON.stringify(state.players[i].tail[j]));
-                        let next = state.players[i].tail[j];
-                        // state.players[i].tail[j] = JSON.parse(JSON.stringify(prev));
-                        state.players[i].tail[j] = prev;
-                        // prev = JSON.parse(JSON.stringify(next));
-                        prev = next;
-                }
-        }
+	state.players.forEach(player => {
+		player.update_snake(state.grid_size);
+	});
 }
 
 function update_map()
@@ -136,7 +108,7 @@ function check_collision()
                         let food = occupants.find(o => o.entity_type === "food");
 
                         if (player && food) {
-                                extend_snake(player);
+				player.extend_tail(state.grid_size);
                                 let index = state.food.indexOf(food);
                                 state.food.splice(index, 1);
                         } else if (player && tail) {
@@ -154,28 +126,6 @@ function check_collision()
                         }
                 }
         }
-}
-
-function extend_snake(player)
-{
-        let end;
-        if (player.tail.length > 0) {
-                end = player.tail[player.tail.length - 1];
-        } else {
-                end = { ...player.pos , dir: { ...player.dir }, parent_id: player.socket_id, entity_type: "tail" };
-        }
-        let new_end = JSON.parse(JSON.stringify(end));
-        if (new_end.dir.up) {
-                new_end.y += state.grid_size;
-        } else if (new_end.dir.down) {
-                new_end.y -= state.grid_size;
-        } else if (new_end.dir.left) {
-                new_end.x += state.grid_size;
-        } else if (new_end.dir.right) {
-                new_end.x -= state.grid_size;
-        }
-
-        player.tail.push(new_end);
 }
 
 module.exports = {
