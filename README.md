@@ -9,10 +9,11 @@ Currently WIP
 
 ## Installation
 ```sh
+cd server
 npm install
 ```
 
 ## Usage
 Start the server with:
 ```sh
-node server/server.js
+node server.js
