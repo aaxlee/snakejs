@@ -15,4 +15,4 @@ npm install
 ## Usage
 Start the server with:
 ```sh
-node server.js
+node server/server.js
