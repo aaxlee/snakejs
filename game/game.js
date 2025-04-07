@@ -2,11 +2,13 @@ const WIDTH = 900;
 const HEIGHT = 450
 
 let state = {
+	over: 0,
         players: [],
         food: [],
         grid_size: 50,
         width: WIDTH,
         height: HEIGHT,
+	food_threshold: 15
 }
 
 let map = [];
@@ -14,18 +16,22 @@ let map = [];
 function warp_snakes()
 {
 	state.players.forEach(player => {
-		player.warp({
-			height: state.height,
-			width: state.width,
-			grid_size: state.grid_size
-		});
+		if (player.is_alive) {
+			player.warp({
+				height: state.height,
+				width: state.width,
+				grid_size: state.grid_size
+			});
+		}
 	});
 }
 
 function update_snakes()
 {
 	state.players.forEach(player => {
-		player.update_snake(state.grid_size);
+		if (player.is_alive) {
+			player.update_snake(state.grid_size);
+		}
 	});
 }
 
@@ -51,13 +57,15 @@ function update_map()
         });
 
         state.players.forEach((player) => {
-                map[player.pos.y / state.grid_size][player.pos.x / state.grid_size].is_occupied = 1;
-                map[player.pos.y / state.grid_size][player.pos.x / state.grid_size].occupants.push(player);
+		if (player.is_alive) {
+			map[player.pos.y / state.grid_size][player.pos.x / state.grid_size].is_occupied = 1;
+			map[player.pos.y / state.grid_size][player.pos.x / state.grid_size].occupants.push(player);
 
-                player.tail.forEach((tail) => {
-                        map[tail.y / state.grid_size][tail.x / state.grid_size].is_occupied = 1;
-                        map[tail.y / state.grid_size][tail.x / state.grid_size].occupants.push(tail);
-                });
+			player.tail.forEach((tail) => {
+				map[tail.y / state.grid_size][tail.x / state.grid_size].is_occupied = 1;
+				map[tail.y / state.grid_size][tail.x / state.grid_size].occupants.push(tail);
+			});
+		}
         });
 }
 
@@ -103,32 +111,56 @@ function check_collision()
                                 continue;
                         }
                         let occupants = map[y][x].occupants;
-                        let player = occupants.find(o => o.entity_type === "player");
-                        let tail = occupants.find(o => o.entity_type === "tail");
+
+                        let players = occupants.filter(o => o.entity_type === "player");
+                        let tails = occupants.filter(o => o.entity_type === "tail");
                         let food = occupants.find(o => o.entity_type === "food");
 
-                        if (player && food) {
-				player.extend_tail(state.grid_size);
+                        if (players.length > 0 && food) {
+				players[0].extend_tail(state.grid_size);
                                 let index = state.food.indexOf(food);
                                 state.food.splice(index, 1);
-                        } else if (player && tail) {
+				generate_food();
+                        } else if (players.length > 0 && tails.length > 0) {
                                 let colliding_player;
-                                state.players.forEach(p => {
-                                        if (p.socket_id === tail.parent_id) {
-                                                colliding_player = p;
-                                        }
-                                });
+				tails.forEach(tail => {
+					state.players.forEach(p => {
+						if (p.socket_id === tail.parent_id) {
+							colliding_player = p;
+						}
+					});
 
-                                let index = colliding_player.tail.indexOf(tail);
-                                if (index !== -1) {
-                                        colliding_player.tail.splice(index);
-                                } 
-                        }
+					let index = colliding_player.tail.indexOf(tail);
+					if (index !== -1) {
+						colliding_player.tail.splice(index);
+					} 
+				});
+                        } else if (players.length > 1) {
+				let weaker = players.find(p => p.tail.length < 1);
+				let stronger = players.find(p => p.tail.length > 0);
+				if (weaker && stronger) {
+					weaker.is_alive = 0;
+				}
+			}
                 }
         }
 }
 
+function is_game_over()
+{
+	let alive_counter = 0;
+	state.players.forEach(player => {
+		if (player.is_alive && state.players.length > 1) {
+			alive_counter++;
+		}
+	});
+	if (alive_counter === 1) {
+		state.over = 1;
+	}
+}
+
 module.exports = {
+	is_game_over,
         state,
         map,
         update_snakes,

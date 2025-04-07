@@ -1,5 +1,6 @@
 class Player {
 	constructor(startpos, socket_id, color) {
+		this.is_alive = 1;
 		this.pos = startpos;
 		this.dir = {
 			left: false,

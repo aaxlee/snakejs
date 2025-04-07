@@ -18,6 +18,7 @@ module.exports = (io) => io.on("connection", (socket) => {
 
                 if (Game.state.players.length % 3 == 0) {
                         Game.state.grid_size /= 2;
+			Game.state.food_threshold = Math.floor(Game.state.food_threshold * 0.7);
                 }
 
                 console.log(player);
@@ -26,6 +27,7 @@ module.exports = (io) => io.on("connection", (socket) => {
 
         socket.on("disconnect", () => {
                 console.log("user disconnected");
+		Game.state.players = Game.state.players.filter(player => player.socket_id != socket_id);
         });
 
         socket.on("client_event", (e, id) => {

@@ -48,8 +48,20 @@ function draw_player(player)
 export function draw_state(state)
 {
         state.players.forEach((player) => {
-                if (player.connected) {
+                if (player.connected && player.is_alive) {
                         draw_player(player);
                 }
         });
+}
+
+export function draw_death_screen()
+{
+	ctx.font = "48px serif";
+	ctx.fillText("YOU DIED...", s.width / 2, s.height / 2);
+}
+
+export function draw_end_screen()
+{
+	ctx.font = "48px serif";
+	ctx.fillText("GAME OVER!!!", 300, 200);
 }
