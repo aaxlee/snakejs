@@ -38,5 +38,13 @@ module.exports = (io) => io.on("connection", (socket) => {
                 }
         });
 
+	socket.on("player_vote", (id) => {
+		Game.state.restart_votes++;
+		if (Game.state.restart_votes == Game.state.players.length) {
+			Game.reset();
+			io.emit("reset_success", Game.state);
+		}
+	});
+
 });
 

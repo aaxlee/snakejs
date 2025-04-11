@@ -34,6 +34,8 @@ setInterval(() => {
 	}
 	if (Game.state.over && started) {
 		io.emit("game_over", Game.state);
+		io.emit("reset_vote");
+		counter = 1;
 	} else  {
 		Game.update_snakes();
 		Game.warp_snakes();
