@@ -41,3 +41,9 @@
     background-color: #eaeaea;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+
+#vote-container {
+	display: none;
+	text-align: center;
+	margin-top: 20px;
+}

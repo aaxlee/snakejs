@@ -14,6 +14,14 @@ join_button.addEventListener("click", () => {
         socket.emit("join_game");
 });
 
+const vote_container = document.getElementById("vote-container");
+const vote_button = document.getElementById("vote-button");
+
+vote_button.addEventListener("click", () => {
+	socket.emit("player_vote");
+	vote_button.disabled = true;
+});
+
 socket.on("game_init", (state, socket_id) => {
         s = state;
         id = socket_id;
@@ -39,6 +47,20 @@ socket.on("server_upd", (state) => {
 socket.on("game_over", (state) => {
 	s = state;
 	game_over = 1;
+});
+
+socket.on("reset_vote", () => {
+	vote_container.style.display = "block";
+	vote_button.disabled = false;
+});
+
+socket.on("reset_success", (state) => {
+	vote_container.style.display = "none";
+	vote_button.disabled = true;
+	game_over = 0;
+	s = state;
+
+	requestAnimationFrame(main);
 });
 
 let last_timestamp = 0;

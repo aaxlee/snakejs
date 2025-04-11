@@ -3,6 +3,7 @@ const HEIGHT = 450
 
 let state = {
 	over: 0,
+	restart_votes: 0,
         players: [],
         food: [],
         grid_size: 50,
@@ -69,13 +70,13 @@ function update_map()
         });
 }
 
-function generate_food()
+function get_empty_coord()
 {
-        const rows = state.height / state.grid_size;
-        const cols = state.width / state.grid_size;
+	const rows = state.height / state.grid_size;
+	const cols = state.width / state.grid_size;
 
-        let x = Math.floor(Math.random() * cols);
-        let y = Math.floor(Math.random() * rows);
+	let x = Math.floor(Math.random() * cols);
+	let y = Math.floor(Math.random() * rows);
 
         const start_x = x;
         const start_y = y;
@@ -91,10 +92,21 @@ function generate_food()
                 }
         }
 
-        if (free_cell) {
+	if (free_cell) {
+		return { x: x, y: y };
+	} else {
+		return null;
+	}
+}
+
+function generate_food()
+{
+	let coord = get_empty_coord();
+
+        if (coord != null) {
                 state.food.push({
-                        x: x * state.grid_size,
-                        y: y * state.grid_size,
+                        x: coord.x * state.grid_size,
+                        y: coord.y * state.grid_size,
                         entity_type: "food"
                 });
         }
@@ -159,8 +171,25 @@ function is_game_over()
 	}
 }
 
+function reset()
+{
+	state.players.forEach(player => {
+		let new_position = get_empty_coord();
+		new_position.x *= state.grid_size;
+		new_position.y *= state.grid_size;
+		player.reset(new_position);
+	});
+	state.over = 0;
+	state.restart_votes = 0;
+	state.food = [];
+	update_map();
+	console.log("here");
+	console.log(state);
+}
+
 module.exports = {
 	is_game_over,
+	reset,
         state,
         map,
         update_snakes,

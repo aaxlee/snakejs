@@ -67,6 +67,17 @@ class Player {
 			this.pos.y = 0;
 		}
 	}
+	reset(new_position) {
+		this.is_alive = 1;
+		this.tail.splice(0, this.tail.length);
+		this.dir = {
+			up: false,
+			down: false,
+			left: false,
+			right: false
+		};
+		this.pos = new_position; 
+	}
 }
 
 module.exports = Player;
