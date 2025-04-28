@@ -11,7 +11,7 @@ module.exports = (io) => io.on("connection", (socket) => {
         let socket_id = socket.id;
         console.log("a user connected");
 
-        socket.on("join_game", () => {
+        socket.on("join_game", (width, height) => {
                 let player = new Player({x: 0, y: 0}, socket_id, get_random_color());
                 let player_index = player.id;
                 Game.state.players.push(player);

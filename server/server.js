@@ -14,7 +14,6 @@ app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, "../client", "index.html"));
 });
 
-// import socket handler
 require("./sockets.js")(io);
 
 const Game = require("../game/game.js");
@@ -25,7 +24,7 @@ function print_map()
         console.log(Game.map.map(row => row.map(cell => (cell.is_occupied ? '█' : '.')).join(' ')).join('\n'));
 }
 
-const TICK_RATE = 60 * 4
+const TICK_RATE = 60 * 4 / 2;
 let counter = 1;
 let started = 0;
 setInterval(() => {
@@ -39,9 +38,9 @@ setInterval(() => {
 	} else  {
 		Game.update_snakes();
 		Game.warp_snakes();
-		Game.update_map();
-		Game.check_collision();
-		Game.is_game_over();
+                Game.update_map();
+                Game.check_collision();
+                Game.is_game_over();
 
 		if (counter == Game.state.food_threshold && Game.state.players.length > 0) {
 			Game.generate_food();
