@@ -2,6 +2,7 @@ class Player {
 	constructor(startpos, socket_id, color) {
 		this.is_alive = 1;
 		this.pos = startpos;
+                this.client_pos = { x: startpos.x, y: startpos.y };
 		this.dir = {
 			left: false,
 			right: false,
@@ -16,16 +17,20 @@ class Player {
 		this.connected = 1;
 		this.entity_type = "player";
 	}
-	update_snake(step_size) {
+	update_snake(step_size, client_step) {
 		let prev = { ...this.pos, dir: { ...this.dir }, parent_id: this.socket_id, entity_type: "tail" };
 		if (this.dir.up) {
 			this.pos.y -= step_size;
+                        this.client_pos.y -= client_step; 
 		} else if (this.dir.down) {
 			this.pos.y += step_size
+                        this.client_pos.y += client_step;
 		} else if (this.dir.left) {
 			this.pos.x -= step_size;
+                        this.client_pos.x -= client_step;
 		} else if (this.dir.right) {
 			this.pos.x += step_size;
+                        this.client_pos.x += client_step;
 		}
 
 		if (this.tail.length > 0) {

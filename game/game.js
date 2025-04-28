@@ -1,15 +1,15 @@
-const WIDTH = 900;
-const HEIGHT = 450
+const WIDTH = 1024;
+const HEIGHT = 512; 
 
 let state = {
 	over: 0,
 	restart_votes: 0,
         players: [],
         food: [],
-        grid_size: 50,
+        grid_size: 64,
         width: WIDTH,
         height: HEIGHT,
-	food_threshold: 15
+	food_threshold: 16
 }
 
 let map = [];
@@ -31,7 +31,7 @@ function update_snakes()
 {
 	state.players.forEach(player => {
 		if (player.is_alive) {
-			player.update_snake(state.grid_size);
+			player.update_snake(state.grid_size, state.grid_size / 2);
 		}
 	});
 }

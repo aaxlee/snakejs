@@ -1,8 +1,13 @@
-import { socket, WIDTH, HEIGHT, join_button, title_screen, canvas_container, c, ctx, grid_size, TARGET_FPS, FRAME_TIME } from "./constants.js";
-import { draw_grid, draw_food, draw_state, draw_death_screen, draw_end_screen } from "./rendering.js";
+import { socket, WIDTH, HEIGHT, join_button,
+         title_screen, canvas_container, c, ctx,
+         grid_size, TARGET_FPS, FRAME_TIME
+} from "./constants.js";
+import { draw_grid, draw_food, draw_state,
+         draw_death_screen, draw_end_screen
+} from "./rendering.js";
 import "./events.js";
 
-export let s;
+export let state;
 export let id;
 export let player_index = -1;
 let game_over = 0;
@@ -11,7 +16,7 @@ join_button.addEventListener("click", () => {
         title_screen.style.display = "none";
         canvas_container.style.display = "flex";
 
-        socket.emit("join_game");
+        socket.emit("join_game", WIDTH, HEIGHT);
 });
 
 const vote_container = document.getElementById("vote-container");
@@ -22,8 +27,8 @@ vote_button.addEventListener("click", () => {
 	vote_button.disabled = true;
 });
 
-socket.on("game_init", (state, socket_id) => {
-        s = state;
+socket.on("game_init", (client_state, socket_id) => {
+        state = client_state;
         id = socket_id;
 
         for (let i = 0; i < state.players.length; i++) {
@@ -40,12 +45,12 @@ socket.on("game_init", (state, socket_id) => {
         }
 });
 
-socket.on("server_upd", (state) => {
-        s = state;
+socket.on("server_upd", (client_state) => {
+        state = client_state;
 });
 
-socket.on("game_over", (state) => {
-	s = state;
+socket.on("game_over", (client_state) => {
+	state = client_state;
 	game_over = 1;
 });
 
@@ -54,11 +59,11 @@ socket.on("reset_vote", () => {
 	vote_button.disabled = false;
 });
 
-socket.on("reset_success", (state) => {
+socket.on("reset_success", (client_state) => {
 	vote_container.style.display = "none";
 	vote_button.disabled = true;
 	game_over = 0;
-	s = state;
+	state = client_state;
 
 	requestAnimationFrame(main);
 });
@@ -76,13 +81,13 @@ function main(timestamp)
 		if (dtime >= FRAME_TIME) { 
 			last_frame_time = timestamp;
 
-			ctx.clearRect(0, 0, 900, 450);
-			if (!s.players[player_index].is_alive) {
+			ctx.clearRect(0, 0, WIDTH, HEIGHT);
+			if (!state.players[player_index].is_alive) {
 				draw_death_screen();
 			}
 			draw_grid();
 			draw_food();
-			draw_state(s);
+			draw_state(state);
 
 			last_timestamp = timestamp;
 		}

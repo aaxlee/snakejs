@@ -1,5 +1,5 @@
 import { socket } from "./constants.js";
-import { s, id, player_index } from "./main.js";
+import { state, id, player_index } from "./main.js";
 
 window.addEventListener("keydown", (e) => {
         e.preventDefault();
