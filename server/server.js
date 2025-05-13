@@ -39,14 +39,12 @@ setInterval(() => {
 	} else {
 		Game.update_snakes();
 		Game.handle_borders();
-                // Game.check_headon_collision();
                 Game.update_map();
                 Game.check_headon_collision();
                 Game.check_collision();
-                // Game.check_headon_collision();
                 Game.is_game_over();
 
-                if (Game.exists_weak_player) {
+                if (Game.exists_weak_player()) {
                         Game.state.food_cooldown = 32 * 8;
                 } else {
                         Game.state.food_cooldown = 32;
@@ -56,7 +54,7 @@ setInterval(() => {
 			Game.generate_food();
 			counter = 0;
 		}
-		print_map();
+		// print_map();
 
 		io.emit("server_upd", Game.state);
 		

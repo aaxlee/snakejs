@@ -3,7 +3,6 @@ class Player {
 		this.is_alive = 1;
 		this.pos = startpos;
                 this.prev_pos = { x: 0, y: 0 };
-                this.client_pos = { x: startpos.x, y: startpos.y };
 		this.dir = {
 			left: false,
 			right: false,
@@ -18,21 +17,17 @@ class Player {
 		this.connected = 1;
 		this.entity_type = "player";
 	}
-	update_snake(step_size, client_step) {
+	update_snake(step_size) {
 		let prev = { ...this.pos, dir: { ...this.dir }, parent_id: this.socket_id, entity_type: "tail" };
                 this.prev_pos = { x: this.pos.x, y: this.pos.y }; 
 		if (this.dir.up) {
 			this.pos.y -= step_size;
-                        this.client_pos.y -= client_step; 
 		} else if (this.dir.down) {
 			this.pos.y += step_size
-                        this.client_pos.y += client_step;
 		} else if (this.dir.left) {
 			this.pos.x -= step_size;
-                        this.client_pos.x -= client_step;
 		} else if (this.dir.right) {
 			this.pos.x += step_size;
-                        this.client_pos.x += client_step;
 		}
 
 		if (this.tail.length > 0) {
@@ -83,10 +78,10 @@ class Player {
 		this.dir = {
 			up: false,
 			down: false,
-			left: false,
+			left: true,
 			right: false
 		};
-		this.pos = new_position; 
+		this.pos = new_position;
 	}
 }
 
