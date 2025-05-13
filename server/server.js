@@ -27,6 +27,7 @@ function print_map()
 const TICK_RATE = 60 * 4 / 2;
 let counter = 1;
 let started = 0;
+Game.update_map();
 setInterval(() => {
 	if (Game.state.players.length > 1) {
 		started = 1;
@@ -35,18 +36,27 @@ setInterval(() => {
 		io.emit("game_over", Game.state);
 		io.emit("reset_vote");
 		counter = 1;
-	} else  {
+	} else {
 		Game.update_snakes();
-		Game.warp_snakes();
+		Game.handle_borders();
+                // Game.check_headon_collision();
                 Game.update_map();
+                Game.check_headon_collision();
                 Game.check_collision();
+                // Game.check_headon_collision();
                 Game.is_game_over();
 
-		if (counter == Game.state.food_threshold && Game.state.players.length > 0) {
+                if (Game.exists_weak_player) {
+                        Game.state.food_cooldown = 32 * 8;
+                } else {
+                        Game.state.food_cooldown = 32;
+                }
+
+		if (counter == Game.state.food_cooldown) {
 			Game.generate_food();
 			counter = 0;
 		}
-		// print_map();
+		print_map();
 
 		io.emit("server_upd", Game.state);
 		
@@ -57,4 +67,3 @@ setInterval(() => {
 server.listen(port, "0.0.0.0", () => {
         console.log("listening on port " + port);
 });
-
