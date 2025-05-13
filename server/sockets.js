@@ -12,7 +12,11 @@ module.exports = (io) => io.on("connection", (socket) => {
         console.log("a user connected");
 
         socket.on("join_game", (width, height) => {
+
                 let player = new Player({x: 0, y: 0}, socket_id, get_random_color());
+                player.dir.right = true;
+                player.extend_tail(Game.state.grid_size);
+                player.extend_tail(Game.state.grid_size);
                 let player_index = player.id;
                 Game.state.players.push(player);
 
