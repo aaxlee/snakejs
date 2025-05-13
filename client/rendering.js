@@ -1,4 +1,4 @@
-import { state, id, player_index } from "./main.js";
+import { state, id, player_index } from "./sockets.js";
 import { ctx, WIDTH, HEIGHT, grid_size } from "./constants.js";
 
 export function draw_grid()

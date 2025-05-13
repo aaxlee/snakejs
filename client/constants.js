@@ -13,3 +13,6 @@ export const HEIGHT = c.height;
 
 export const TARGET_FPS = 30;
 export const FRAME_TIME = 1000 / TARGET_FPS; // time per frame (milliseconds)
+
+export const vote_container = document.getElementById("vote-container");
+export const vote_button = document.getElementById("vote-button");

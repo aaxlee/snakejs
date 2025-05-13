@@ -1,79 +1,15 @@
-import { socket, WIDTH, HEIGHT, join_button,
-         title_screen, canvas_container, c, ctx,
-         grid_size, TARGET_FPS, FRAME_TIME
-} from "./constants.js";
+import { state, player_index } from "./sockets.js";
+import { ctx, WIDTH, HEIGHT, TARGET_FPS, FRAME_TIME } from "./constants.js";
 import { draw_grid, draw_food, draw_state,
          draw_death_screen, draw_end_screen
 } from "./rendering.js";
 import "./events.js";
 
-export let state;
-export let id;
-export let player_index = -1;
-let game_over = 0;
-
-join_button.addEventListener("click", () => {
-        title_screen.style.display = "none";
-        canvas_container.style.display = "flex";
-
-        socket.emit("join_game", WIDTH, HEIGHT);
-});
-
-const vote_container = document.getElementById("vote-container");
-const vote_button = document.getElementById("vote-button");
-
-vote_button.addEventListener("click", () => {
-	socket.emit("player_vote");
-	vote_button.disabled = true;
-});
-
-socket.on("game_init", (client_state, socket_id) => {
-        state = client_state;
-        id = socket_id;
-
-        for (let i = 0; i < state.players.length; i++) {
-                if (state.players[i].socket_id == socket_id) {
-                        player_index = i;
-                        break;
-                }
-        }
-
-        if (player_index != -1) {
-                requestAnimationFrame(main);
-        } else {
-                console.log("Player index error");
-        }
-});
-
-socket.on("server_upd", (client_state) => {
-        state = client_state;
-});
-
-socket.on("game_over", (client_state) => {
-	state = client_state;
-	game_over = 1;
-});
-
-socket.on("reset_vote", () => {
-	vote_container.style.display = "block";
-	vote_button.disabled = false;
-});
-
-socket.on("reset_success", (client_state) => {
-	vote_container.style.display = "none";
-	vote_button.disabled = true;
-	game_over = 0;
-	state = client_state;
-
-	requestAnimationFrame(main);
-});
-
+export let game_over = 0;
 let last_timestamp = 0;
 let last_frame_time = 0;
-let fps;
-let count = 0;
 
-function main(timestamp)
+export function main(timestamp)
 {
 	if (!game_over) {
 		let dtime = timestamp - last_frame_time;
@@ -92,7 +28,6 @@ function main(timestamp)
 			last_timestamp = timestamp;
 		}
 
-		count++;
 		requestAnimationFrame(main);
 	} else {
 		draw_end_screen();
