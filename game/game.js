@@ -31,7 +31,7 @@ function update_snakes()
 {
 	state.players.forEach(player => {
 		if (player.is_alive) {
-			player.update_snake(state.grid_size, state.grid_size / 2);
+			player.update_snake(state.grid_size);
 		}
 	});
 }
@@ -115,7 +115,20 @@ function generate_food()
         }
 }
 
-// MIGHT CAUSE BORDER BUG, TEST!!!
+function kill_player(player)
+{
+        player.is_alive = 0;
+        player.tail.forEach(tail => {
+                const map_x = tail.x / state.grid_size;
+                const map_y = tail.y / state.grid_size;
+                const cell = map[map_y][map_x];
+                tail_index = cell.occupants.findIndex(t => t.x === tail.x && t.y === tail.y);
+                if (tail_index !== -1) {
+                        cell.occupants.splice(tail_index, 1);
+                }
+        });
+}
+
 // When head-on collisions occur, the players' positions switch
 function check_headon_collision()
 {
@@ -130,25 +143,72 @@ function check_headon_collision()
 
                         if (p1.pos.x === p2.prev_pos.x && p1.pos.y === p2.prev_pos.y &&
                             p2.pos.x === p1.prev_pos.x && p2.pos.y === p1.prev_pos.y) {
-                                console.log("COLLISION!");
+                                console.log("HEAD-ON COLLISION");
                                 if (p1.tail.length < 1 && p2.tail.length < 1) {
                                         p1.is_alive = 0;
+                                        kill_player(p1);
                                         p2.is_alive = 0;
+                                        kill_player(p2);
                                 } else if (p1.tail.length > 1 && p2.tail.length < 1) {
                                         p2.is_alive = 0;
+                                        kill_player(p2);
                                 } else if (p1.tail.length < 1 && p2.tail.length > 1) {
                                         p1.is_alive = 0;
+                                        kill_player(p1);
                                 } else {
                                         p1.is_alive = 0;
                                         p2.is_alive = 0;
+                                        kill_player(p1);
+                                        kill_player(p2);
                                 }
                         }
                 }
         }
 }
 
-// TODO: optimize by iterating over players then check the cell the player is in?
 function check_collision()
+{
+        for (let i = 0; i < state.players.length; i++) {
+                let player = state.players[i];
+                const map_x = player.pos.x / state.grid_size;
+                const map_y = player.pos.y / state.grid_size;
+
+                if (!map[map_y][map_x].is_occupied) continue;
+                let occupants = map[map_y][map_x].occupants;
+
+                let players = occupants.filter(o => o.entity_type === "player" && o.is_alive);
+                let tail = occupants.find(o => o.entity_type === "tail");
+                let food = occupants.find(o => o.entity_type === "food");
+                if (players.length > 0 && food) {
+                        // if a player is on the same cell as food
+                        players[0].extend_tail(state.grid_size);
+                        let index = state.food.indexOf(food);
+                        state.food.splice(index, 1);
+                        generate_food();
+                } else if (players.length === 2) {
+                        // if two players are on the same cell
+                        let weaker = players.find(p => p.tail.length < 1);
+                        let stronger = players.find(p => p.tail.length > 0);
+                        if (weaker && stronger) {
+                                weaker.is_alive = 0;
+                        }
+                } else if (players.length > 0 && tail) {
+                        // if a player is on the same cell as a tail
+                        let colliding_player = state.players.find(p => p.socket_id === tail.parent_id);
+
+                        let tail_index = colliding_player.tail.findIndex(t => t.x === tail.x && t.y === tail.y);
+                        if (tail_index !== -1) {
+                                colliding_player.tail.forEach(t => {
+                                        cell = map[t.y / state.grid_size][t.x / state.grid_size];
+                                        cell.occupants.splice(t, 1);
+                                });
+                                colliding_player.tail.splice(tail_index);
+                        }
+                }
+        }
+}
+
+function check_collision_old()
 {
         const rows = state.height / state.grid_size;
         const cols = state.width / state.grid_size;
@@ -199,7 +259,7 @@ function check_collision()
 }
 
 // checks if any player has lost their tail
-function exists_weak_snake()
+function exists_weak_player()
 {
         for (let i = 0; i < state.players.length; i++) {
                 if (state.players[i].tail.length < 1) {
@@ -213,11 +273,12 @@ function is_game_over()
 {
 	let alive_counter = 0;
 	state.players.forEach(player => {
-		if (player.is_alive && state.players.length > 1) {
+		if (player.is_alive) {
 			alive_counter++;
 		}
 	});
-	if (alive_counter === 1) {
+	if (alive_counter === 1 && state.players.length > 1 ||
+            alive_counter === 0 && state.players.length > 1) {
 		state.over = 1;
 	}
 }
@@ -229,6 +290,7 @@ function reset()
 		new_position.x *= state.grid_size;
 		new_position.y *= state.grid_size;
 		player.reset(new_position);
+                player.extend_tail(state.grid_size);
 	});
 	state.over = 0;
 	state.restart_votes = 0;
@@ -240,6 +302,7 @@ module.exports = {
 	is_game_over,
 	reset,
         state,
+        exists_weak_player,
         map,
         update_snakes,
         update_map,
