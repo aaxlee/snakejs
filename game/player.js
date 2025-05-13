@@ -2,6 +2,7 @@ class Player {
 	constructor(startpos, socket_id, color) {
 		this.is_alive = 1;
 		this.pos = startpos;
+                this.prev_pos = { x: 0, y: 0 };
                 this.client_pos = { x: startpos.x, y: startpos.y };
 		this.dir = {
 			left: false,
@@ -19,6 +20,7 @@ class Player {
 	}
 	update_snake(step_size, client_step) {
 		let prev = { ...this.pos, dir: { ...this.dir }, parent_id: this.socket_id, entity_type: "tail" };
+                this.prev_pos = { x: this.pos.x, y: this.pos.y }; 
 		if (this.dir.up) {
 			this.pos.y -= step_size;
                         this.client_pos.y -= client_step; 
@@ -57,7 +59,10 @@ class Player {
 			new_end.x += step_size;
 		} else if (new_end.dir.right) {
 			new_end.x -= step_size;
-		}
+		} else {
+                        new_end.y -= step_size;
+                        new_end.x -= step_size;
+                }
 
 		this.tail.push(new_end);
 	}
