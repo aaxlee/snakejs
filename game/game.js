@@ -145,19 +145,13 @@ function check_headon_collision()
                             p2.pos.x === p1.prev_pos.x && p2.pos.y === p1.prev_pos.y) {
                                 console.log("HEAD-ON COLLISION");
                                 if (p1.tail.length < 1 && p2.tail.length < 1) {
-                                        p1.is_alive = 0;
                                         kill_player(p1);
-                                        p2.is_alive = 0;
                                         kill_player(p2);
-                                } else if (p1.tail.length > 1 && p2.tail.length < 1) {
-                                        p2.is_alive = 0;
+                                } else if (p1.tail.length > 0 && p2.tail.length < 1) {
                                         kill_player(p2);
-                                } else if (p1.tail.length < 1 && p2.tail.length > 1) {
-                                        p1.is_alive = 0;
+                                } else if (p1.tail.length < 1 && p2.tail.length > 0) {
                                         kill_player(p1);
                                 } else {
-                                        p1.is_alive = 0;
-                                        p2.is_alive = 0;
                                         kill_player(p1);
                                         kill_player(p2);
                                 }
