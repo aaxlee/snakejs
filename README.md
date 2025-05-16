@@ -12,12 +12,11 @@ Currently WIP
 cd server
 npm install
 ```
-
 ## Usage
 Start the server with:
 ```sh
 node server.js
-
+```
 ## About the game
 - Be the last snake standing.
 - Cut off other snake's tail by running into it.
