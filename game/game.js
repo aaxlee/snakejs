@@ -150,10 +150,10 @@ function check_headon_collision()
 
                         // swap
                         const swapped = 
-                            p1.pos.x === p2.prev_pos.x &&
-                            p1.pos.y === p2.prev_pos.y &&
-                            p2.pos.x === p1.prev_pos.x &&
-                            p2.pos.y === p1.prev_pos.y;
+                                p1.pos.x === p2.prev_pos.x &&
+                                p1.pos.y === p2.prev_pos.y &&
+                                p2.pos.x === p1.prev_pos.x &&
+                                p2.pos.y === p1.prev_pos.y;
 
                         // meet-in-middle
                         const same_cell = p1.pos.x === p2.pos.x && p1.pos.y === p2.pos.y;
