@@ -133,6 +133,18 @@ function kill_player(player)
         });
 }
 
+function is_opposite_dirs(p1, p2)
+{
+        if (p1.dir.left && p2.dir.right) return 1;
+        else if (p1.dir.right && p2.dir.left) return 1;
+        else if (p1.dir.up && p2.dir.down) return 1;
+        else if (p1.dir.down && p2.dir.up) return 1;
+        else return 0;
+}
+
+// iterates over all possible pairs of players
+// if they have swapped positions, a head-on collision occured
+// or if they are on the same cell with opposite directions
 function check_headon_collision()
 {
         for (let i = 0; i < state.players.length; i++) {
@@ -142,22 +154,13 @@ function check_headon_collision()
 
                         if (!p1.is_alive || !p2.is_alive) continue;
 
-                        // detect swap-past or meet-in-middle head-on
-                        const dx1 = p1.pos.x - p1.prev_pos.x;
-                        const dy1 = p1.pos.y - p1.prev_pos.y;
-                        const dx2 = p2.pos.x - p2.prev_pos.x;
-                        const dy2 = p2.pos.y - p2.prev_pos.y;
-
-                        // swap
                         const swapped = 
                                 p1.pos.x === p2.prev_pos.x &&
                                 p1.pos.y === p2.prev_pos.y &&
                                 p2.pos.x === p1.prev_pos.x &&
                                 p2.pos.y === p1.prev_pos.y;
-
-                        // meet-in-middle
                         const same_cell = p1.pos.x === p2.pos.x && p1.pos.y === p2.pos.y;
-                        const opposite_dirs = dx1 === -dx2 && dy1 === -dy2;
+                        const opposite_dirs = is_opposite_dirs(p1, p2);
 
                         if (swapped || (same_cell && opposite_dirs)) {
                                 if (p1.tail.length === p2.tail.length) {
@@ -215,7 +218,6 @@ function check_collision()
                                 kill_player(p1);
                                 kill_player(p2);
                         }
-
                 } else if (players.length > 0 && tail) {
                         // if a player is on the same cell as a tail
                         let colliding_player = state.players.find(p => p.socket_id === tail.parent_id);
