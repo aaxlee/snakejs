@@ -8,6 +8,8 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+const DEBUG_ENABLED = 0
+
 app.use(express.static(path.join(__dirname, "../client")));
 
 app.get('/', (req, res) => {
@@ -45,16 +47,17 @@ setInterval(() => {
                 Game.is_game_over();
 
                 if (Game.exists_weak_player()) {
-                        Game.state.food_cooldown = 32 * 8;
+                        Game.state.food_cooldown = 64 * 2;
                 } else {
-                        Game.state.food_cooldown = 32;
+                        Game.state.food_cooldown = 64;
                 }
 
 		if (counter == Game.state.food_cooldown) {
+                        console.log("food");
 			Game.generate_food();
 			counter = 0;
 		}
-		// print_map();
+		if (DEBUG_ENABLED) print_map();
 
 		io.emit("server_upd", Game.state);
 		

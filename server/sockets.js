@@ -13,7 +13,7 @@ module.exports = (io) => io.on("connection", (socket) => {
 
         socket.on("join_game", (width, height) => {
 
-                let player = new Player({x: 0, y: 0}, socket_id, get_random_color());
+                let player = new Player({x: 2 * Game.state.grid_size, y: 0}, socket_id, get_random_color());
                 player.dir.right = true;
                 player.extend_tail(Game.state.grid_size);
                 player.extend_tail(Game.state.grid_size);
@@ -25,7 +25,6 @@ module.exports = (io) => io.on("connection", (socket) => {
 			Game.state.food_threshold = Math.floor(Game.state.food_threshold * 0.7);
                 }
 
-                console.log(player);
                 socket.emit("game_init", Game.state, socket_id);
         });
 
@@ -51,4 +50,3 @@ module.exports = (io) => io.on("connection", (socket) => {
 	});
 
 });
-

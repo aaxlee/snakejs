@@ -17,9 +17,9 @@ class Player {
 		this.connected = 1;
 		this.entity_type = "player";
 	}
+        // moves snake one step, depends on the direction
 	update_snake(step_size) {
 		let prev = { ...this.pos, dir: { ...this.dir }, parent_id: this.socket_id, entity_type: "tail" };
-                this.prev_pos = { x: this.pos.x, y: this.pos.y }; 
 		if (this.dir.up) {
 			this.pos.y -= step_size;
 		} else if (this.dir.down) {
@@ -61,6 +61,7 @@ class Player {
 
 		this.tail.push(new_end);
 	}
+        // moves the player to the opposite side if it tries to go beyond the border
 	warp(state) {
 		if (this.pos.x < 0) {
 			this.pos.x = state.width - state.grid_size;
